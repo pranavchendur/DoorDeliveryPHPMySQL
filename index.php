@@ -1,3 +1,9 @@
+<?php
+    // Start the session
+    session_start();
+    if (isset($_SESSION['area']))
+        header('Location: categories.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -26,13 +32,13 @@
         </div>
     </div>
     <br>
-    <form action="categories.html" method="post">
+    <form action="categories.php" method="post">
     <div class="row">
         <div class="col-md-2"></div>
 
         <div class="col-md-8">      
               <div class="form-group">            
-                <input type="text" class="form-control" id="search" placeholder="Enter Area or Pincode">
+                <input type="text" class="form-control" id="area" name="area" placeholder="Enter Area or Pincode">
               </div>
             
         </div>
@@ -47,7 +53,7 @@
             </center>
         </div>
     </div>
-
+    </form>
 
 </div>
 
@@ -57,3 +63,6 @@
     <script src="js/bootstrap.min.js"></script>
   </body>
 </html>
+<?php
+    //session_destroy();
+?>

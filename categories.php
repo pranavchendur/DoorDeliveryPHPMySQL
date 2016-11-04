@@ -1,3 +1,41 @@
+<?php
+	session_start();
+	require 'db/connect.php';
+    if (isset($_POST['area']) || isset($_SESSION['area'])) {
+		//the query string is received from the url and converted top lower case.
+		$q = strtolower($_POST['area']);
+
+		//SQL Commands to search the table for the rows which are to be displayed for the category listing page with query parameters searched through the columns category, site, title and description.
+
+		//lower is used to coinvert all the letters to lower case in-order to get proper matching.
+
+		$sql ="SELECT area_id FROM area_alt_names WHERE lower(altname) LIKE lower('".$q."%') LIMIT 1;";
+
+		$ret = pg_query($db, $sql);
+		if(!$ret){
+			echo pg_last_error($db);
+			exit;
+		}
+
+		$row = pg_fetch_assoc($ret);
+
+		$_SESSION['area'] = $row['area_id'];
+		//echo $_SESSION['area'];
+
+		$sql ="SELECT cid,name,image FROM categories;";
+
+		$ret = pg_query($db, $sql);
+		if(!$ret){
+			echo pg_last_error($db);
+			exit;
+		}
+
+	}
+	else {
+		header('Location: index.php');
+		exit;
+	}
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -28,8 +66,8 @@
     <br>
      <div class="row Logo">
         <div class="col-sm-10 col-md-offset-3 col-md-6">
-        	<form>
-				<input type="text" class="form-control" id="search" placeholder="Search for Category"> <center> <input class="btn btn-default" type="button" 
+        	<form action="search.php" method="get">
+				<input type="text" class="form-control" name="search" placeholder="Search for Category"> <center> <input class="btn btn-default" type="button" 
 				value="Search" ></center>
 			</form>
         </div>
@@ -42,49 +80,24 @@
 	    </div>
     <br>
 	    <div class="row padding">
+	<?php
+		//Loops throught the fetched data and returns the result in the form of formatted and styled HTML
+		//echo $_SESSION['area'];
+        while($row = pg_fetch_assoc($ret)){
+    ?>
 	    	<div class="col-sm-2">
 		    	<center>
-		    		<img src="images/food.jpg" alt="..." class="img-responsive img-circle">
-		    		<a href="">
-		    			<button class="btn btn-default"><a href="service.html">Food</button>
+		    		<img src="<?php echo $row['image']; ?>" alt="..." class="img-responsive img-circle">
+		    		<a class="btn btn-default" href="service.php?id=<?php echo $row['cid']; ?>">
+		    		<?php echo $row['name']; ?>
 		    		</a>
 		    	</center>
 	    	</div>
-	    	<div class="col-sm-2">
-		    	<center>
-		    		<img src="images/fashion.jpg" alt="..." class="img-responsive img-circle">
-		    		<a href="">
-		    			<button class="btn btn-default">Fashion</button>
-		    		</a>
-		    	</center>
-	    	</div>
-	    	<div class="col-sm-2">
-		    	<center>
-		    		<img src="images/elec.jpg" alt="..." class="img-responsive img-circle">
-		    		<a href="">
-		    			<button class="btn btn-default">Electronics</button>
-		    		</a>
-		    	</center>
-	    	</div>
-	    	<div class="col-sm-2">
-		    	<center>
-		    		<img src="images/groc.jpg" alt="..." class="img-responsive img-circle">
-		    		<a href="">
-		    			<button class="btn btn-default">Groceries</button>
-		    		</a>
-		    	</center>
-	    	</div>
-	    	
-	    	<div class="col-sm-2">
-		    	<center>
-		    		<img src="images/sports.jpg" alt="..." class="img-responsive img-circle">
-		    		<a href="">
-		    			<button class="btn btn-default">Sports</button>
-		    		</a>
-		    	</center>
-	    	</div>
-	    	</div>
-	    	<center><form action="Index.html" method="post"><button class="btn btn-default">Back</button></form></center>
+	<?php
+		}
+	?>
+	    </div>
+	    	<center><form action="index.php" method="post"><button class="btn btn-default">Back</button></form></center>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
